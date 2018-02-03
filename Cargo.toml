@@ -1,0 +1,12 @@
+[package]
+name = "platform_unix"
+version = "0.1.0"
+authors = ["panicbit <panicbit.dev@gmail.com>"]
+
+[lib]
+name = "platform"
+path = "lib.rs"
+
+[dependencies]
+abstract_platform = { path = '../abstract_platform' }
+libc = "0.2.36"
