@@ -21,7 +21,7 @@ use core::str;
 use core::mem;
 use alloc::rc::Rc;
 use alloc::arc::Arc;
-use ap::sys_common::{AsInner, IntoInner};
+use ap::sys_common::{AsInner, IntoInner, FromInner};
 use ap::sys_common::bytestring::debug_fmt_bytestring;
 use std_unicode::lossy::Utf8Lossy;
 
@@ -61,6 +61,14 @@ impl fmt::Display for Buf {
 impl IntoInner<Vec<u8>> for Buf {
     fn into_inner(self) -> Vec<u8> {
         self.inner
+    }
+}
+
+impl FromInner<Vec<u8>> for Buf {
+    fn from_inner(buf: Vec<u8>) -> Buf {
+        Buf {
+            inner: buf
+        }
     }
 }
 

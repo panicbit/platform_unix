@@ -6,6 +6,7 @@
 #![feature(unicode)]
 #![feature(str_internals)]
 #![feature(try_from)]
+#![feature(platform_internals)]
 
 extern crate abstract_platform as ap;
 extern crate libc;
@@ -28,6 +29,7 @@ mod pipe;
 mod os_str;
 mod path;
 mod time;
+mod fs;
 // mod rand;
 // mod stack_overflow;
 
@@ -54,11 +56,23 @@ impl traits::Std for Std {
     type c_ulong = libc::c_ulong;
     type c_ulonglong = libc::c_ulonglong;
     type c_ushort = libc::c_ushort;
+
     type Mutex = mutex::Mutex;
+
     type OsString = os_str::Buf;
     type OsStr = os_str::Slice;
+
     type SystemTime = time::SystemTime;
     type Instant = time::Instant;
+
+    type File = fs::File;
+    type FileAttr = fs::FileAttr;
+    type ReadDir = fs::ReadDir;
+    type OpenOptions = fs::OpenOptions;
+    type Permissions = fs::FilePermissions;
+    type FileType = fs::FileType;
+    type DirBuilder = fs::DirBuilder;
+    type DirEntry = fs::DirEntry;
 
     const UNIX_EPOCH: Self::SystemTime = time::UNIX_EPOCH;
 
@@ -156,6 +170,46 @@ impl traits::Std for Std {
     const MAIN_PATH_SEP_STR: &'static str = path::MAIN_SEP_STR;
 
     const MAIN_PATH_SEP: char = path::MAIN_SEP;
+
+    fn readdir(p: &path::Path) -> io::Result<Self::ReadDir> {
+        fs::readdir(p)
+    }
+    fn unlink(p: &path::Path) -> io::Result<()> {
+        fs::unlink(p)
+    }
+    fn stat(p: &path::Path) -> io::Result<Self::FileAttr> {
+        fs::stat(p)
+    }
+    fn lstat(p: &path::Path) -> io::Result<Self::FileAttr> {
+        fs::lstat(p)
+    }
+    fn rename(old: &path::Path, new: &path::Path) -> io::Result<()> {
+        fs::rename(old, new)
+    }
+    fn copy(from: &path::Path, to: &path::Path) -> io::Result<u64> {
+        fs::copy(from, to)
+    }
+    fn link(src: &path::Path, dst: &path::Path) -> io::Result<()> {
+        fs::link(src, dst)
+    }
+    fn symlink(src: &path::Path, dst: &path::Path) -> io::Result<()> {
+        fs::symlink(src, dst)
+    }
+    fn readlink(p: &path::Path) -> io::Result<path::PathBuf> {
+        fs::readlink(p)
+    }
+    fn canonicalize(p: &path::Path) -> io::Result<path::PathBuf> {
+        fs::canonicalize(p)
+    }
+    fn set_perm(p: &path::Path, perm: Self::Permissions) -> io::Result<()> {
+        fs::set_perm(p, perm)
+    }
+    fn rmdir(p: &path::Path) -> io::Result<()> {
+        fs::rmdir(p)
+    }
+    fn remove_dir_all(p: &path::Path) -> io::Result<()> {
+        fs::remove_dir_all(p)
+    }
 
     fn memchr(needle: u8, haystack: &[u8]) -> Option<usize> {
         memchr::memchr(needle, haystack)
