@@ -30,8 +30,10 @@ mod os_str;
 mod path;
 mod time;
 mod fs;
-// mod rand;
+mod stdio;
+
 // mod stack_overflow;
+// mod rand;
 
 use ap::traits;
 use ap::io::ErrorKind;
@@ -73,6 +75,10 @@ impl traits::Std for Std {
     type FileType = fs::FileType;
     type DirBuilder = fs::DirBuilder;
     type DirEntry = fs::DirEntry;
+
+    // type Stdin = stdio::Stdin;
+    // type Stdout = stdio::Stdout;
+    type Stderr = stdio::Stderr;
 
     const UNIX_EPOCH: Self::SystemTime = time::UNIX_EPOCH;
 
