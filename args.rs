@@ -70,20 +70,23 @@ impl DoubleEndedIterator for Args {
           target_os = "l4re",
           target_os = "fuchsia"))]
 mod imp {
-    use Std;
+    use ap::prelude::*;
     use ap::traits::{Mutex as MutexT};
+    use Std;
+    use os_str;
     // use os::unix::prelude::*;
     use core::ptr;
-    // use ffi::{CStr, OsString};
+    use ffi::{CStr, OsString};
     use core::marker::PhantomData;
-    // use libc;
+    use libc;
     use super::Args;
 
     use ap::sys_common::mutex::Mutex;
+    use ap::sys_common::FromInner;
 
     static mut ARGC: isize = 0;
     static mut ARGV: *const *const u8 = ptr::null();
-    static LOCK: Mutex<Std> = Mutex::<Std>::NEW;
+    static LOCK: Mutex<Std> = Mutex::new();
 
     pub unsafe fn init(argc: isize, argv: *const *const u8) {
         LOCK.lock();
@@ -99,29 +102,30 @@ mod imp {
         LOCK.unlock();
     }
 
-    // pub fn args() -> Args {
-    //     Args {
-    //         iter: clone().into_iter(),
-    //         _dont_send_or_sync_me: PhantomData
-    //     }
-    // }
+    pub fn args() -> Args {
+        Args {
+            iter: clone().into_iter(),
+            _dont_send_or_sync_me: PhantomData
+        }
+    }
 
-    // fn clone() -> Vec<OsString> {
-    //     unsafe {
-    //         LOCK.lock();
-    //         let ret = (0..ARGC).map(|i| {
-    //             let cstr = CStr::from_ptr(*ARGV.offset(i) as *const libc::c_char);
-    //             OsStringExt::from_vec(cstr.to_bytes().to_vec())
-    //         }).collect();
-    //         LOCK.unlock();
-    //         return ret
-    //     }
-    // }
+    fn clone() -> Vec<OsString> {
+        unsafe {
+            LOCK.lock();
+            let ret = (0..ARGC).map(|i| {
+                let cstr = CStr::from_ptr(*ARGV.offset(i) as *const libc::c_char);
+                OsString::from_inner(os_str::Buf::from_inner(cstr.to_bytes().to_vec()))
+            }).collect();
+            LOCK.unlock();
+            return ret
+        }
+    }
 }
 
 #[cfg(any(target_os = "macos",
           target_os = "ios"))]
 mod imp {
+    use ap::prelude::*;
     use ffi::CStr;
     use core::marker::PhantomData;
     use libc;
@@ -170,9 +174,9 @@ mod imp {
     // res
     #[cfg(target_os = "ios")]
     pub fn args() -> Args {
-        use ffi::OsString;
-        use mem;
-        use str;
+        use ap::ffi::OsString;
+        use core::mem;
+        use core::str;
 
         extern {
             fn sel_registerName(name: *const libc::c_uchar) -> Sel;

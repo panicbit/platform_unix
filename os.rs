@@ -13,6 +13,8 @@
 #![allow(unused_imports)] // lots of cfg code here
 
 use ap::prelude::*;
+use ap::traits::{Mutex as MutexT};
+use Std;
 
 // use os::unix::prelude::*;
 
@@ -29,13 +31,13 @@ use path::{self, PathBuf};
 // use ptr;
 // use slice;
 use core::str;
-// use sys_common::mutex::Mutex;
+use ap::sys_common::mutex::Mutex;
 // use sys::cvt;
 // use sys::fd;
 // use vec;
 
 const TMPBUF_SZ: usize = 128;
-// static ENV_LOCK: Mutex = Mutex::new();
+static ENV_LOCK: Mutex<Std> = Mutex::new();
 
 
 extern {

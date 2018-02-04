@@ -30,7 +30,7 @@ mod imp {
     use fs::File;
     use io::Read;
     use libc;
-    use sys::os::errno;
+    use ::os::errno;
 
     #[cfg(any(target_os = "linux", target_os = "android"))]
     fn getrandom(buf: &mut [u8]) -> libc::c_long {
